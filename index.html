@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <link href="style.css" rel="stylesheet">
+</head>
+
+<script>
+
+
+const options = {
+    method: "GET",
+    headers:{
+    "X-Api-Key": 'L+1rlwjKSE4AwHYtz7XaRg==RX8XE6UGTyEtK3mj',
+        },
+    };
+
+    const apiURL1 = "https://api.api-ninjas.com/v1/randomword"
+    
+    let guessAmount = 0;
+    let guesses = [];
+    let lives = 4;
+    let wins = 0;
+
+    async function getWord()
+    {
+        const response = await fetch(apiURL1, options)
+        const data = await response.json()
+
+            let newWord = data.word;
+        
+        return newWord;
+    }
+
+    async function getSynonym(nextWord)
+    {
+        let newURL = "https://api.api-ninjas.com/v1/thesaurus?word="+nextWord;
+        const response = await fetch(newURL, options)
+        const data = await response.json()
+
+        console.log(data.synonyms);
+        console.log(data.synonyms.length);
+
+        let synArray = [data.synonyms[0], data.synonyms[1], data.synonyms[2]];
+
+        return synArray;
+    }
+
+    async function getSynonymLength(nextWord)
+    {
+        let newURL = "https://api.api-ninjas.com/v1/thesaurus?word="+nextWord;
+        const response = await fetch(newURL, options)
+        const data = await response.json()
+
+        console.log(data.synonyms.length);
+
+        return data.synonyms.length;
+    }
+
+    async function createArray()
+    {
+        let myArray = [[{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}], 
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}],
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}],
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}]];
+
+        for (let i = 0; i < 4; i++)
+        {
+            let synLength = 0;
+            let newWord = "";
+
+            //let newWord = await getWord();
+            //synLength = await getSynonymLength(newWord);
+                //console.log(newWord, synLength);
+            
+
+            while(synLength < 4)
+            {
+                    newWord = await getWord();
+                    synLength = await getSynonymLength(newWord);
+                    console.log(newWord, synLength);
+            }
+
+                //console.log(newWord);
+                myArray[i][0].word = newWord;
+                myArray[i][0].wordID = "group"+i;
+                let newSyn = await getSynonym(newWord);
+
+            for (let j = 0; j < 3; j++)
+            {
+                myArray[i][(j+1)].word = newSyn[j];
+                myArray[i][(j+1)].wordID = "group"+i;
+            }
+        }
+
+        console.log(myArray);
+
+        return myArray;
+    }
+
+    async function shuffleBoard(board) {
+    for (var i = 0; i < board.length; i++) {
+        for (var j = 0; j < board[i].length; j++) {
+            var i1 = Math.floor(Math.random() * (board.length));
+            var j1 = Math.floor(Math.random() * (board.length));
+
+            var temp = board[i][j].word;
+            var temp2 = board[i][j].wordID;
+            board[i][j].word = board[i1][j1].word;
+            board[i][j].wordID = board[i1][j1].wordID;
+            board[i1][j1].word = temp;
+            board[i1][j1].wordID = temp2;
+        }
+    }
+        console.log("Shuffled Array", board);
+        return board;
+    }
+
+    function loadingFunc(state)
+    {
+        document.getElementById("loadH1").hidden = state;
+        
+    }
+
+    function textAppear(state)
+    {
+        document.getElementById("Text").hidden = state;
+    }
+
+    function copyArray(array)
+    {
+        var newArray = [[{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}], 
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}],
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}],
+        [{word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}, {word: "", wordID: ""}]];
+
+        for (let i = 0; i < 4; i++)
+        {
+            for (let j = 0; j < 4; j++)
+            {
+                newArray[i][j].word = array[i][j].word;
+                newArray[i][j].wordID = array[i][j].wordID;
+            }
+        }
+
+        return newArray;
+    }
+
+    function clicked(clickedID)
+    {
+        //let currButton = document.getElementById(clickedID);
+
+        if (clickedID.style.backgroundColor == "white")
+        {
+            clickedID.style.backgroundColor = "darkGrey";
+            gameOp(clickedID);
+            console.log("clicked", clickedID.id);
+        }
+
+        else
+        {
+            clickedID.style.backgroundColor = "white";
+        }
+    }
+
+    function gameOp(clickedID)
+    {
+        guesses.push(clickedID.id);
+        guessAmount++;
+        
+        console.log("guess amount:",guessAmount);
+
+        if(guessAmount == 4)
+        {
+            for (let i = 0; i < 4; i++)
+            {
+                for (let j = 0; j < 4; j++)
+                {
+                    if (guesses[i] != guesses[j])
+                    {
+                        //incorrect combo
+                        while (guesses.length > 0) 
+                        {
+                            guesses.pop();
+                        }
+
+                        guessAmount = 0;
+
+                        subLives();
+                        resetButtons();
+                        console.log("wrong");
+                        
+                        return;
+                    }
+                }
+            }
+
+            while (guesses.length > 0) 
+            {
+                guesses.pop();
+            }
+
+            guessAmount = 0;
+
+
+            deleteButtonGroup(clickedID.id);
+            resetButtons();
+
+            wins++;
+
+            if(wins == 4)
+            {
+                youWin();
+            }
+
+            console.log("Correct Combo");
+
+        }
+        
+    }
+
+    function subLives()
+    {
+        lives--;
+
+        document.getElementById("canvasLive").remove();
+
+        if(lives == 0)
+        {
+            location.reload();
+        }
+
+    }
+
+    function deleteButtonGroup(buttonGroup)
+    {
+        for (let i = 0; i < 4; i++)
+        {
+            document.getElementById(buttonGroup).remove();
+        }
+    }
+
+    function resetButtons()
+    {   
+        let buttons = document.getElementsByClassName('btn');
+
+        for(let i = 0; i < buttons.length; i++)
+        {
+            buttons[i].style.backgroundColor = "white";
+        }
+            
+    }
+
+    function youWin()
+    {
+        let firstDiv = document.getElementById("buttonLayout");
+
+        let newHead = document.createElement("H1");
+
+        let text = document.createTextNode("You Win!!! Refresh to play again!");
+
+                newHead.appendChild(text);
+
+                firstDiv.appendChild(newHead);
+    }
+
+    async function createButtons()
+    {
+
+        loadingFunc(false);
+
+        textAppear(true);
+
+        let wordArray = await createArray();
+
+        let shuffleArray = copyArray(wordArray);
+
+        console.log(shuffleArray);
+
+        shuffleBoard(shuffleArray);
+
+        loadingFunc(true);
+
+        for (let i = 0; i < 4; i++ )
+        {
+            for (let j = 0; j<4; j++)
+            {
+                   
+                let firstDiv = document.getElementById("buttonLayout");
+
+                let button = document.createElement('Button');
+
+                button.id = shuffleArray[i][j].wordID;
+
+                button.className = "btn";
+
+                button.style.backgroundColor = "white";
+
+                button.onclick = function(){clicked(this)};
+
+                let text = document.createTextNode(shuffleArray[i][j].word);
+
+                button.appendChild(text);
+
+                firstDiv.appendChild(button);
+            }
+        }
+
+        textAppear(false);
+
+        for (let z = 0; z < 4; z++)
+        {
+            let secondDiv = document.getElementById("UILayout");
+            
+            let canvas = document.createElement('Canvas');
+
+            const ctx = canvas.getContext("2d");
+
+            canvas.id = "canvasLive";
+
+            ctx.beginPath();
+            ctx.arc(100, 75, 50, 0, 2 * Math.PI);
+
+            ctx.fillStyle = "#FB8B89";
+            ctx.fill();
+            ctx.lineWidth = 5;
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+        
+            
+            secondDiv.appendChild(canvas);
+        }
+    }
+
+</script>
+
+<body onload="createButtons()">
+
+<h1>Connections</h1>
+<h2>Find 4 sets of 4 words that are the same</h2>
+<h1 id = "loadH1">Loading...</h1>
+
+<div id = buttonLayout></div>
+<div id = "Text">
+    <H1>Lives</H1>
+</div>
+<div id = "UILayout"></div>
+
+</body>
+
+</html>
