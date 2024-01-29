@@ -150,36 +150,61 @@ const options = {
     {
         //let currButton = document.getElementById(clickedID);
 
+        console.log("Guess Amount:", guessAmount);
+
         if (clickedID.style.backgroundColor == "white")
         {
-            clickedID.style.backgroundColor = "darkGrey";
-            gameOp(clickedID);
-            console.log("clicked", clickedID.id);
+            if(guessAmount <= 3)
+            {
+                clickedID.style.backgroundColor = "darkGrey";
+                //gameOp(clickedID);
+                console.log("clicked", clickedID.id);
+                guessAmount++;
+                guesses.push(clickedID.id);
+            }
+
+            else
+            {
+                return;
+            }
         }
 
         else
         {
+            guessAmount--;
             clickedID.style.backgroundColor = "white";
+            guesses.pop(clickedID.id);
         }
     }
 
-    function gameOp(clickedID)
+    function submitGuess()
     {
-        guesses.push(clickedID.id);
-        guessAmount++;
-        
-        console.log("guess amount:",guessAmount);
+
+        var state = true;
 
         if(guessAmount == 4)
         {
+
+            
+
+                
             for (let i = 0; i < 4; i++)
             {
                 for (let j = 0; j < 4; j++)
                 {
                     if (guesses[i] != guesses[j])
                     {
-                        //incorrect combo
-                        while (guesses.length > 0) 
+                        state = false;
+                    }
+                }
+            }
+            
+
+
+            if(state == false)
+            {
+                //incorrect combo
+                while (guesses.length > 0) 
                         {
                             guesses.pop();
                         }
@@ -191,19 +216,22 @@ const options = {
                         console.log("wrong");
                         
                         return;
-                    }
-                }
             }
 
-            while (guesses.length > 0) 
+            if (state == true)
+            {
+
+            deleteButtonGroup(guesses[0]);
+
+                while (guesses.length > 0) 
             {
                 guesses.pop();
             }
 
-            guessAmount = 0;
+                guessAmount = 0;
 
 
-            deleteButtonGroup(clickedID.id);
+            
             resetButtons();
 
             wins++;
@@ -214,10 +242,9 @@ const options = {
             }
 
             console.log("Correct Combo");
-
         }
-        
-    }
+
+    }}
 
     function subLives()
     {
@@ -342,6 +369,7 @@ const options = {
 
 <div id = buttonLayout></div>
 <div id = "Text">
+    <button onclick = "submitGuess()" class = "btn" id = "buttonSub">Submit</button>
     <H1>Lives</H1>
 </div>
 <div id = "UILayout"></div>

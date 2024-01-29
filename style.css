@@ -22,11 +22,53 @@ h2
     text-align: center;
 }
 
-button
+#buttonSub
+{
+    background-color: white;
+    height: 75px;
+    width: 50%;
+    margin-top: 2%;
+    padding: 50x;
+    font-size: 30px;
+    transform: translateX(50%);
+    
+}
+
+#group0
 {
     background-color: white;
     float: left;
-    height: 150px;
+    height: 125px;
+    width: 25%;
+    padding: 50x;
+    font-size: 30px;
+}
+
+#group1
+{
+    background-color: white;
+    float: left;
+    height: 125px;
+    width: 25%;
+    padding: 50x;
+    font-size: 30px;
+}
+
+#group2
+{
+    background-color: white;
+    float: left;
+    height: 125px;
+    width: 25%;
+    padding: 50x;
+    font-size: 30px;
+}
+
+#group3
+{
+    background-color: white;
+    float: left;
+    height: 125px;
     width: 25%;
     padding: 50x;
     font-size: 30px;
@@ -34,8 +76,8 @@ button
 
 canvas
 {
-    float: left;
+    
     height: 100px;
     width: 25%;
-    text-align: center;
+    transform: translateX(14%);
 }
